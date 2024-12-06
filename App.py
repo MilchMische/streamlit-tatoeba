@@ -56,16 +56,24 @@ if 'data' in st.session_state and st.session_state['data'] is not None:
             if pd.isna(italian_sentence) or pd.isna(english_translation):
                 continue
 
-            # Aktualisieren der Platzhalter mit dem italienischen Satz
-            italian_placeholder.subheader("🇮🇹 Italienischer Satz:")
-            italian_placeholder.markdown(f"<p style='font-size:24px; color:#333; font-style:italic;'>{italian_sentence}</p>", unsafe_allow_html=True)
+            # Italienischen Satz mit Fade-In und Fade-Out anzeigen
+            italian_html = f"""
+            <div style="text-align:center; font-size:24px; font-style:italic; color:#333; opacity:1; transition: opacity 3s;">
+                🇮🇹 {italian_sentence}
+            </div>
+            """
+            italian_placeholder.markdown(italian_html, unsafe_allow_html=True)
 
-            # 3 Sekunden warten, bevor die Übersetzung angezeigt wird
+            # 3 Sekunden warten, bevor die englische Übersetzung angezeigt wird
             time.sleep(3)
 
-            # Aktualisieren der Platzhalter mit der englischen Übersetzung
-            english_placeholder.subheader("🇬🇧 Englische Übersetzung:")
-            english_placeholder.markdown(f"<p style='font-size:24px; color:#007ACC;'>{english_translation}</p>", unsafe_allow_html=True)
+            # Englische Übersetzung mit Fade-In und Fade-Out anzeigen
+            english_html = f"""
+            <div style="text-align:center; font-size:24px; color:#007ACC; opacity:1; transition: opacity 3s;">
+                🇬🇧 {english_translation}
+            </div>
+            """
+            english_placeholder.markdown(english_html, unsafe_allow_html=True)
 
             # 3 Sekunden warten, bevor das nächste Paar angezeigt wird
             time.sleep(3)
@@ -73,5 +81,6 @@ if 'data' in st.session_state and st.session_state['data'] is not None:
             # Löschen der alten Sätze
             italian_placeholder.empty()
             english_placeholder.empty()
+
 else:
     st.info("Bitte lade eine TSV-Datei hoch, um zu starten.")
