@@ -9,10 +9,6 @@ def load_data(uploaded_file):
         # Datei einlesen und nur die Spalten mit den relevanten Daten behalten
         data = pd.read_csv(uploaded_file, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
         
-        # Dateiinformationen anzeigen
-        st.write("Vorschau der ersten 5 Zeilen der hochgeladenen Datei:")
-        st.write(data.head())  # Zeige die ersten 5 Zeilen der Datei
-        
         # Überprüfen, ob mindestens 2 Spalten vorhanden sind
         if data.shape[1] < 2:
             st.error(f"Die hochgeladene Datei enthält {data.shape[1]} Spalten. Erwartet werden mindestens 2 Spalten.")
@@ -33,12 +29,6 @@ if uploaded_file is not None:
     data = load_data(uploaded_file)
 
     if data is not None:
-        # Zufälligen Index für den Satz auswählen
-        random_index = random.randint(0, len(data) - 1)
-
-        italian_sentence = data.iloc[random_index, 0]
-        english_translation = data.iloc[random_index, 1]
-
         # Fade-In & Fade-Out Animation für den italienischen Satz und die Übersetzung
         st.markdown("""
         <style>
@@ -54,16 +44,19 @@ if uploaded_file is not None:
         </style>
         """, unsafe_allow_html=True)
 
-        # Anzeige des italienischen Satzes mit Fade-In
-        with st.empty():
-            st.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
-            time.sleep(3)  # 3 Sekunden warten
+        while True:
+            # Zufälligen Index für den Satz auswählen
+            random_index = random.randint(0, len(data) - 1)
 
-        # Anzeige der englischen Übersetzung mit Fade-Out
-        with st.empty():
-            st.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
-            time.sleep(3)  # 3 Sekunden warten
+            italian_sentence = data.iloc[random_index, 0]
+            english_translation = data.iloc[random_index, 1]
 
-        # Wiederhole den Vorgang, indem der Benutzer den Button klickt
-        if st.button("Nächster Satz"):
-            st.experimental_rerun()
+            # Anzeige des italienischen Satzes mit Fade-In
+            with st.empty():
+                st.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
+                time.sleep(3)  # 3 Sekunden warten
+
+            # Anzeige der englischen Übersetzung mit Fade-Out
+            with st.empty():
+                st.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
+                time.sleep(3)  # 3 Sekunden warten
