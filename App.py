@@ -16,53 +16,50 @@ def load_data(uploaded_file):
         st.error(f"Unerwarteter Fehler: {e}")
         return None
 
-# Titel für die Streamlit-App
+# Titel der Streamlit-App
 st.title("✨ Tatoeba Satzpaare-Anzeige ✨")
 
-# Datei-Upload für den Benutzer
-uploaded_file = st.file_uploader("Lade deine TSV-Datei hoch", type=["tsv"])
+# Prüfen, ob die Datei schon im Session State gespeichert wurde
+if 'data' not in st.session_state:
+    # Datei-Upload für den Benutzer
+    uploaded_file = st.file_uploader("Lade deine TSV-Datei hoch", type=["tsv"])
 
-# Überprüfen, ob eine Datei hochgeladen wurde
-if uploaded_file is not None:
-    # Daten laden
-    data = load_data(uploaded_file)
+    # Wenn eine Datei hochgeladen wird, speichern wir sie im Session State
+    if uploaded_file is not None:
+        st.session_state['data'] = load_data(uploaded_file)
 
-    # Falls Daten erfolgreich geladen wurden
-    if data is not None:
-        # Spaltennamen und erste Zeilen der Datei anzeigen
-        st.write("Spaltennamen in der hochgeladenen Datei:")
-        st.write(data.columns)  # Zeigt die Spaltennamen an
+# Wenn die Datei geladen ist, fahren wir fort
+if 'data' in st.session_state and st.session_state['data'] is not None:
+    data = st.session_state['data']
 
-        st.write("Erste Zeilen der Datei:")
-        st.write(data.head())  # Zeigt die ersten Zeilen zur Überprüfung an
+    # Platzhalter für die dynamische Satzanzeige
+    italian_placeholder = st.empty()
+    english_placeholder = st.empty()
 
-        # Placeholder für die dynamische Aktualisierung
-        italian_placeholder = st.empty()
-        english_placeholder = st.empty()
+    # Button zum Starten der Satzanzeige
+    if st.button("Satzpaare anzeigen"):
+        for _ in range(10):  # Anzahl der angezeigten Sätze
+            # Zufälliges Satzpaar aus den Daten auswählen
+            random_row = data.sample(1).iloc[0]
+            italian_sentence = random_row[2]  # 3. Spalte: Italienischer Satz
+            english_translation = random_row[4]  # 5. Spalte: Englische Übersetzung
 
-        # Button zum Starten der Satzanzeige
-        if st.button("Satzpaare anzeigen"):
-            for _ in range(10):  # Anzahl der Sätze anpassen
-                # Zufälliges Satzpaar aus den Daten auswählen
-                random_row = data.sample(1).iloc[0]
-                italian_sentence = random_row[0]  # Erste Spalte (ggf. anpassen)
-                english_translation = random_row[1]  # Zweite Spalte (ggf. anpassen)
+            # Aktualisieren der Platzhalter mit dem italienischen Satz
+            italian_placeholder.subheader("🇮🇹 Italienischer Satz:")
+            italian_placeholder.markdown(f"<p style='font-size:24px; color:#333; font-style:italic;'>{italian_sentence}</p>", unsafe_allow_html=True)
 
-                # Aktualisieren der Platzhalter mit den Sätzen
-                italian_placeholder.subheader("🇮🇹 Italienischer Satz:")
-                italian_placeholder.markdown(f"<p style='font-size:24px; color:#333; font-style:italic;'>{italian_sentence}</p>", unsafe_allow_html=True)
+            # 3 Sekunden warten, bevor die Übersetzung angezeigt wird
+            time.sleep(3)
 
-                # 3 Sekunden warten, bevor die Übersetzung angezeigt wird
-                time.sleep(3)
+            # Aktualisieren der Platzhalter mit der englischen Übersetzung
+            english_placeholder.subheader("🇬🇧 Englische Übersetzung:")
+            english_placeholder.markdown(f"<p style='font-size:24px; color:#007ACC;'>{english_translation}</p>", unsafe_allow_html=True)
 
-                english_placeholder.subheader("🇬🇧 Englische Übersetzung:")
-                english_placeholder.markdown(f"<p style='font-size:24px; color:#007ACC;'>{english_translation}</p>", unsafe_allow_html=True)
+            # 3 Sekunden warten, bevor das nächste Paar angezeigt wird
+            time.sleep(3)
 
-                # 3 Sekunden warten, bevor das nächste Paar angezeigt wird
-                time.sleep(3)
-
-                # Löschen der alten Sätze vor dem nächsten Durchlauf
-                italian_placeholder.empty()
-                english_placeholder.empty()
+            # Löschen der alten Sätze
+            italian_placeholder.empty()
+            english_placeholder.empty()
 else:
     st.info("Bitte lade eine TSV-Datei hoch, um zu starten.")
