@@ -1,42 +1,28 @@
+import streamlit as st
 import gdown
 import pandas as pd
-import random
-import time
-import streamlit as st
 
-# Funktion zum Laden der Datei automatisch von Google Drive
+# Funktion zum Laden der Datei von Google Drive
 def load_data_from_drive():
-    # Direktlink für Google Drive (richtiger Format)
-    url = "https://drive.google.com/uc?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm"  # Ersetze dies mit der richtigen ID
-    output_path = "/mnt/data/tatoeba_data.tsv"  # Speicherort für die heruntergeladene Datei
+    url = 'https://drive.google.com/uc?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm'
+    output_path = '/mnt/data/tatoeba_data.tsv'
+    gdown.download(url, output_path, quiet=False)
+    data = pd.read_csv(output_path, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
+    return data
 
-    try:
-        # Datei von Google Drive herunterladen
-        gdown.download(url, output_path, quiet=False)
-
-        # TSV-Datei einlesen
-        data = pd.read_csv(output_path, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
-
-        # Überprüfen, ob mindestens 2 Spalten vorhanden sind
-        if data.shape[1] < 2:
-            st.error(f"Die hochgeladene Datei enthält {data.shape[1]} Spalten. Erwartet werden mindestens 2 Spalten.")
-            return None
-        return data
-    except gdown.exceptions.FileURLRetrievalError as e:
-        st.error(f"Fehler beim Abrufen der Datei von Google Drive: {e}")
-        return None
-    except Exception as e:
-        st.error(f"Unbekannter Fehler: {e}")
-        return None
-
-# Streamlit app layout
+# Streamlit App Layout
 st.title("Tatoeba Satzanzeige mit Fade-Effekt")
 
-# Datei automatisch von Google Drive laden
+# Laden der Daten
 data = load_data_from_drive()
 
-# Wenn die Daten geladen wurden, Sätze anzeigen
 if data is not None:
+    st.write("Daten erfolgreich geladen")
+
+    # Zufällige Auswahl und Anzeige der Sätze
+    import random
+    import time
+    
     st.markdown("""
     <style>
     .fade {
@@ -51,7 +37,6 @@ if data is not None:
     </style>
     """, unsafe_allow_html=True)
 
-    # Wiederholter Wechsel der Sätze
     while True:
         # Zufälligen Index für den Satz auswählen
         random_index = random.randint(0, len(data) - 1)
