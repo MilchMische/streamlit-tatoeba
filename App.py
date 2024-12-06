@@ -49,8 +49,8 @@ if 'data' in st.session_state and st.session_state['data'] is not None:
         for _ in range(10):  # Anzahl der angezeigten Sätze
             # Zufälliges Satzpaar aus den Daten auswählen
             random_row = data.sample(1).iloc[0]
-            italian_sentence = random_row[1]  # 2. Spalte: Italienischer Satz
-            english_translation = random_row[1]  # 4. Spalte: Englische Übersetzung
+            italian_sentence = random_row[0]  # 1. Spalte: Italienischer Satz
+            english_translation = random_row[1]  # 2. Spalte: Englische Übersetzung
 
             # Satzpaare nur anzeigen, wenn beide Werte vorhanden sind
             if pd.isna(italian_sentence) or pd.isna(english_translation):
