@@ -1,10 +1,12 @@
 import streamlit as st
 import gdown
 import pandas as pd
+import random
+import time
 
 # Funktion zum Laden der Datei von Google Drive
 def load_data_from_drive():
-    url = 'https://drive.google.com/uc?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm'
+    url = 'https://drive.usercontent.google.com/download?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm&export=download&authuser=0&confirm=t&uuid=ef83cedc-bc3a-48d6-ab3c-c2c29955c9779&at=APvzH3qoWFGUm2vYXcR2bDKPOhcw:1733471675277'
     output_path = '/mnt/data/tatoeba_data.tsv'
     gdown.download(url, output_path, quiet=False)
     data = pd.read_csv(output_path, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
@@ -20,9 +22,6 @@ if data is not None:
     st.write("Daten erfolgreich geladen")
 
     # Zufällige Auswahl und Anzeige der Sätze
-    import random
-    import time
-    
     st.markdown("""
     <style>
     .fade {
