@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import random
+import time
 
 # Funktion zum Laden der hochgeladenen Datei und zur Inspektion des Dateiinhalts
 def load_data(uploaded_file):
@@ -18,16 +19,16 @@ def load_data(uploaded_file):
         return None
 
 # Streamlit app layout
-st.title("Tatoeba Satzanzeige mit Fade-Effekt")
+st.title("")
 
-# Datei hochladen oder neu laden
+# Datei hochladen, aber nur, wenn sie noch nicht geladen wurde
 if 'data' not in st.session_state:
     uploaded_file = st.file_uploader("Lade eine TSV-Datei hoch", type=["tsv"])
     
     if uploaded_file is not None:
         st.session_state.data = load_data(uploaded_file)
 
-# Wenn die Datei bereits geladen wurde
+# Wenn die Datei bereits hochgeladen wurde, die Sätze anzeigen
 if 'data' in st.session_state and st.session_state.data is not None:
     data = st.session_state.data
     
