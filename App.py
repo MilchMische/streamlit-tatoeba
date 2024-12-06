@@ -7,7 +7,11 @@ import time
 def load_data(uploaded_file):
     try:
         # Datei einlesen und fehlerhafte Zeilen überspringen
-        data = pd.read_csv(uploaded_file, sep="\t", on_bad_lines="skip")
+        data = pd.read_csv(uploaded_file, sep="\t", on_bad_lines="skip", header=None)
+        # Überprüfen, ob mindestens 5 Spalten vorhanden sind
+        if data.shape[1] < 5:
+            st.error("Die hochgeladene Datei enthält nicht genügend Spalten.")
+            return None
         return data
     except pd.errors.ParserError as e:
         st.error(f"Fehler beim Laden der Daten: {e}")
@@ -43,6 +47,10 @@ if 'data' in st.session_state and st.session_state['data'] is not None:
             random_row = data.sample(1).iloc[0]
             italian_sentence = random_row[2]  # 3. Spalte: Italienischer Satz
             english_translation = random_row[4]  # 5. Spalte: Englische Übersetzung
+
+            # Satzpaare nur anzeigen, wenn beide Werte vorhanden sind
+            if pd.isna(italian_sentence) or pd.isna(english_translation):
+                continue
 
             # Aktualisieren der Platzhalter mit dem italienischen Satz
             italian_placeholder.subheader("🇮🇹 Italienischer Satz:")
