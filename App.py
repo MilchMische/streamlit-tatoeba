@@ -17,7 +17,7 @@ def load_data(uploaded_file):
         return None
 
 # Set the title for the Streamlit app
-st.title("Tatoeba Sentence Pair Display")
+st.title("✨ Tatoeba Sentence Pair Display ✨")
 
 # File uploader for the user to upload a TSV file
 uploaded_file = st.file_uploader("Upload your TSV file", type=["tsv"])
@@ -27,36 +27,38 @@ if uploaded_file is not None:
     # Load the dataset
     data = load_data(uploaded_file)
 
-    # If data is loaded, display it
+    # If data is loaded, proceed
     if data is not None:
-        # Display the column names for debugging
-        st.write("Column names in the uploaded file:", data.columns)
+        # Remove sentence IDs, assuming they're in the first column (adjust if needed)
+        data = data.iloc[:, 1:]  # Keep only the actual sentences
 
-        # Display one sentence and its translation in a loop
+        # Create placeholders to dynamically update content
+        italian_placeholder = st.empty()
+        english_placeholder = st.empty()
+
+        # Button to start displaying sentences
         if st.button("Start Displaying Sentence Pairs"):
-            for i in range(10):  # Change this value for the number of sentences you want to display
-                # Pick a random row from the dataset
+            for _ in range(10):  # Adjust number of sentences to display as needed
+                # Pick a random sentence pair from the dataset
                 random_row = data.sample(1).iloc[0]
+                italian_sentence = random_row[0]  # First column is Italian
+                english_translation = random_row[1]  # Second column is English
 
-                # Check and adjust the column names based on the actual file content
-                italian_sentence = random_row.get(data.columns[0], None)  # First column (likely Italian)
-                english_translation = random_row.get(data.columns[1], None)  # Second column (likely English)
+                # Update the placeholders with the sentences
+                italian_placeholder.subheader("🇮🇹 Italian:")
+                italian_placeholder.markdown(f"<p style='font-size:24px; color:#333; font-style:italic;'>{italian_sentence}</p>", unsafe_allow_html=True)
 
-                if italian_sentence is not None and english_translation is not None:
-                    st.subheader("Italian Sentence:")
-                    st.write(italian_sentence)
+                # Wait for 3 seconds before showing the translation
+                time.sleep(3)
 
-                    # Pause for 3 seconds before showing the translation
-                    time.sleep(3)
+                english_placeholder.subheader("🇬🇧 English Translation:")
+                english_placeholder.markdown(f"<p style='font-size:24px; color:#007ACC;'>{english_translation}</p>", unsafe_allow_html=True)
 
-                    st.subheader("English Translation:")
-                    st.write(english_translation)
+                # Wait another 3 seconds before moving to the next pair
+                time.sleep(3)
 
-                    # Wait for 3 seconds before showing the next pair
-                    time.sleep(3)
-                else:
-                    st.error("Could not find Italian or English columns in the file.")
-    else:
-        st.error("Failed to load the dataset.")
+                # Clear the previous sentences before displaying the next one
+                italian_placeholder.empty()
+                english_placeholder.empty()
 else:
     st.info("Please upload a TSV file to get started.")
