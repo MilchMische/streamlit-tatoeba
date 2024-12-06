@@ -3,75 +3,66 @@ import pandas as pd
 import random
 import time
 
-# Function to load data from the uploaded file
+# Funktion zum Laden der hochgeladenen Datei
 def load_data(uploaded_file):
     try:
-        # Read the uploaded TSV file and skip lines with unexpected number of fields
+        # Datei einlesen und fehlerhafte Zeilen überspringen
         data = pd.read_csv(uploaded_file, sep="\t", on_bad_lines="skip")
         return data
     except pd.errors.ParserError as e:
-        st.error(f"Error loading data: {e}")
+        st.error(f"Fehler beim Laden der Daten: {e}")
         return None
     except Exception as e:
-        st.error(f"Unexpected error: {e}")
+        st.error(f"Unerwarteter Fehler: {e}")
         return None
 
-# Zeigt die ersten paar Zeilen und die Spaltennamen der hochgeladenen TSV-Datei an
+# Titel für die Streamlit-App
+st.title("✨ Tatoeba Satzpaare-Anzeige ✨")
+
+# Datei-Upload für den Benutzer
+uploaded_file = st.file_uploader("Lade deine TSV-Datei hoch", type=["tsv"])
+
+# Überprüfen, ob eine Datei hochgeladen wurde
 if uploaded_file is not None:
-    # Laden der Datei
-    data = pd.read_csv(uploaded_file, sep="\t", on_bad_lines="skip")
-    
-    # Spaltennamen und erste paar Zeilen anzeigen
-    st.write("Column names in the uploaded file:")
-    st.write(data.columns)  # Zeigt die Spaltennamen an
-    
-    st.write("First few rows of the file:")
-    st.write(data.head())  # Zeigt die ersten Zeilen zur Überprüfung an
-
-
-# Set the title for the Streamlit app
-st.title("✨ Tatoeba Sentence Pair Display ✨")
-
-# File uploader for the user to upload a TSV file
-uploaded_file = st.file_uploader("Upload your TSV file", type=["tsv"])
-
-# Check if the user has uploaded a file
-if uploaded_file is not None:
-    # Load the dataset
+    # Daten laden
     data = load_data(uploaded_file)
 
-    # If data is loaded, proceed
+    # Falls Daten erfolgreich geladen wurden
     if data is not None:
-        # Remove sentence IDs, assuming they're in the first column (adjust if needed)
-        data = data.iloc[:, 1:]  # Keep only the actual sentences
+        # Spaltennamen und erste Zeilen der Datei anzeigen
+        st.write("Spaltennamen in der hochgeladenen Datei:")
+        st.write(data.columns)  # Zeigt die Spaltennamen an
 
-        # Create placeholders to dynamically update content
+        st.write("Erste Zeilen der Datei:")
+        st.write(data.head())  # Zeigt die ersten Zeilen zur Überprüfung an
+
+        # Placeholder für die dynamische Aktualisierung
         italian_placeholder = st.empty()
         english_placeholder = st.empty()
 
-        # Button to start displaying sentences
-        if st.button("Start Displaying Sentence Pairs"):
-            for _ in range(10):  # Adjust number of sentences to display as needed
-                # Pick a random sentence pair from the dataset
+        # Button zum Starten der Satzanzeige
+        if st.button("Satzpaare anzeigen"):
+            for _ in range(10):  # Anzahl der Sätze anpassen
+                # Zufälliges Satzpaar aus den Daten auswählen
                 random_row = data.sample(1).iloc[0]
-                italian_sentence = random_row[0]  # First column is Italian
-                english_translation = random_row[1]  # Second column is English
+                italian_sentence = random_row[0]  # Erste Spalte (ggf. anpassen)
+                english_translation = random_row[1]  # Zweite Spalte (ggf. anpassen)
 
-                # Update the placeholders with the sentences
-                italian_placeholder.subheader("🇮🇹 Italian:")
+                # Aktualisieren der Platzhalter mit den Sätzen
+                italian_placeholder.subheader("🇮🇹 Italienischer Satz:")
                 italian_placeholder.markdown(f"<p style='font-size:24px; color:#333; font-style:italic;'>{italian_sentence}</p>", unsafe_allow_html=True)
 
-                # Wait for 3 seconds before showing the translation
+                # 3 Sekunden warten, bevor die Übersetzung angezeigt wird
                 time.sleep(3)
 
-                english_placeholder.subheader("🇬🇧 English Translation:")
+                english_placeholder.subheader("🇬🇧 Englische Übersetzung:")
                 english_placeholder.markdown(f"<p style='font-size:24px; color:#007ACC;'>{english_translation}</p>", unsafe_allow_html=True)
 
-                # Wait another 3 seconds before moving to the next pair
+                # 3 Sekunden warten, bevor das nächste Paar angezeigt wird
                 time.sleep(3)
 
-                # Clear the previous sentences before displaying the next one
+                # Löschen der alten Sätze vor dem nächsten Durchlauf
                 italian_placeholder.empty()
                 english_placeholder.empty()
 else:
-    st.info("Please upload a TSV file to get started.")
+    st.info("Bitte lade eine TSV-Datei hoch, um zu starten.")
