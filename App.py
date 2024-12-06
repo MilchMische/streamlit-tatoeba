@@ -1,55 +1,51 @@
 import streamlit as st
-import gdown
 import pandas as pd
+import gdown
 import random
 import time
 
-# Funktion zum Laden der Datei von Google Drive
-def load_data_from_drive():
-    url = 'https://drive.usercontent.google.com/download?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm&export=download&authuser=0&confirm=t&uuid=ef83cedc-bc3a-48d6-ab3c-c2c29955c9779&at=APvzH3qoWFGUm2vYXcR2bDKPOhcw:1733471675277'
+# Funktion zum Herunterladen der Datei von Google Drive
+def download_file():
+    url = 'https://drive.google.com/uc?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm&export=download'
     output_path = '/mnt/data/tatoeba_data.tsv'
     gdown.download(url, output_path, quiet=False)
-    data = pd.read_csv(output_path, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
-    return data
+    return output_path
 
-# Streamlit App Layout
-st.title("Tatoeba Satzanzeige mit Fade-Effekt")
+# Lade die TSV-Datei
+def load_data():
+    file_path = download_file()
+    try:
+        # Datei als DataFrame laden
+        data = pd.read_csv(file_path, sep='\t', header=None)
+        data.columns = ['Index', 'ID_Italian', 'Italian', 'ID_English', 'English']
+        return data
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return None
 
-# Laden der Daten
-data = load_data_from_drive()
+# Funktion zum Anzeigen der Sätze mit Fade-Effekten
+def show_sentences(data):
+    # Streamlit Widgets zum Starten der Animation
+    if data is not None:
+        sentence_index = random.randint(0, len(data)-1)  # Zufälligen Satz auswählen
+        italian_sentence = data.iloc[sentence_index]['Italian']
+        english_translation = data.iloc[sentence_index]['English']
+        
+        # Animation: fade out und fade in
+        with st.empty():
+            st.markdown(f"<h2 style='text-align: center; color: blue;'>{italian_sentence}</h2>", unsafe_allow_html=True)
+            time.sleep(3)
+            st.markdown(f"<h3 style='text-align: center; color: green;'>{english_translation}</h3>", unsafe_allow_html=True)
+            time.sleep(3)
+            st.experimental_rerun()
 
-if data is not None:
-    st.write("Daten erfolgreich geladen")
+# Hauptfunktion für die Streamlit-App
+def main():
+    st.title("Italienische Sätze mit Übersetzung")
+    
+    data = load_data()  # Lade die Daten
+    if data is not None:
+        show_sentences(data)  # Zeige die Sätze mit der Animation
 
-    # Zufällige Auswahl und Anzeige der Sätze
-    st.markdown("""
-    <style>
-    .fade {
-        animation: fadeInOut 6s;
-    }
-    @keyframes fadeInOut {
-        0% { opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { opacity: 0; }
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    while True:
-        # Zufälligen Index für den Satz auswählen
-        random_index = random.randint(0, len(data) - 1)
-
-        italian_sentence = data.iloc[random_index, 0]
-        english_translation = data.iloc[random_index, 1]
-
-        italian_block = st.empty()
-        italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
-        time.sleep(3)
-
-        english_block = st.empty()
-        english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
-        time.sleep(3)
-
-        italian_block.empty()
-        english_block.empty()
+if __name__ == "__main__":
+    main()
