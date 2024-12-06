@@ -44,6 +44,7 @@ if uploaded_file is not None:
         </style>
         """, unsafe_allow_html=True)
 
+        # Wiederholter Wechsel der Sätze
         while True:
             # Zufälligen Index für den Satz auswählen
             random_index = random.randint(0, len(data) - 1)
@@ -51,12 +52,16 @@ if uploaded_file is not None:
             italian_sentence = data.iloc[random_index, 0]
             english_translation = data.iloc[random_index, 1]
 
-            # Anzeige des italienischen Satzes mit Fade-In
-            with st.empty():
-                st.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
-                time.sleep(3)  # 3 Sekunden warten
+            # Block für den italienischen Satz
+            italian_block = st.empty()
+            italian_block.markdown(f"<h3 class='fade'>{italian_sentence}</h3>", unsafe_allow_html=True)
+            time.sleep(3)  # 3 Sekunden warten
 
-            # Anzeige der englischen Übersetzung mit Fade-Out
-            with st.empty():
-                st.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
-                time.sleep(3)  # 3 Sekunden warten
+            # Block für die englische Übersetzung
+            english_block = st.empty()
+            english_block.markdown(f"<h3 class='fade'>{english_translation}</h3>", unsafe_allow_html=True)
+            time.sleep(3)  # 3 Sekunden warten
+
+            # Lösche die Inhalte der vorherigen Sätze
+            italian_block.empty()
+            english_block.empty()
