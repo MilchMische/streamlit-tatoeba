@@ -1,16 +1,19 @@
 import streamlit as st
 import pandas as pd
-import random
-import time
 
-# Funktion zum Laden der hochgeladenen Datei
+# Funktion zum Laden der hochgeladenen Datei und zur Inspektion des Dateiinhalts
 def load_data(uploaded_file):
     try:
-        # Datei einlesen und fehlerhafte Zeilen überspringen
+        # Datei einlesen und einige Zeilen anzeigen, um den Inhalt zu überprüfen
         data = pd.read_csv(uploaded_file, sep="\t", on_bad_lines="skip", header=None)
+        
+        # Dateiinformationen anzeigen
+        st.write("Vorschau der ersten 5 Zeilen der hochgeladenen Datei:")
+        st.write(data.head())  # Zeige die ersten 5 Zeilen der Datei
+        
         # Überprüfen, ob mindestens 5 Spalten vorhanden sind
         if data.shape[1] < 5:
-            st.error("Die hochgeladene Datei enthält nicht genügend Spalten.")
+            st.error(f"Die hochgeladene Datei enthält {data.shape[1]} Spalten. Erwartet werden mindestens 5 Spalten.")
             return None
         return data
     except pd.errors.ParserError as e:
