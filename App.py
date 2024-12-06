@@ -1,22 +1,12 @@
 import streamlit as st
 import pandas as pd
-import gdown
 import random
 import time
 
-# Funktion zum Herunterladen der Datei von Google Drive
-def download_file():
-    url = 'https://drive.google.com/uc?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm&export=download'
-    output_path = '/mnt/data/tatoeba_data.tsv'
-    gdown.download(url, output_path, quiet=False)
-    return output_path
-
-# Lade die TSV-Datei
-def load_data():
-    file_path = download_file()
+# Funktion zum Laden der Datei, wenn sie manuell hochgeladen wird
+def load_data(uploaded_file):
     try:
-        # Datei als DataFrame laden
-        data = pd.read_csv(file_path, sep='\t', header=None)
+        data = pd.read_csv(uploaded_file, sep='\t', header=None)
         data.columns = ['Index', 'ID_Italian', 'Italian', 'ID_English', 'English']
         return data
     except Exception as e:
@@ -43,8 +33,12 @@ def show_sentences(data):
 def main():
     st.title("Italienische Sätze mit Übersetzung")
     
-    data = load_data()  # Lade die Daten
-    if data is not None:
+    # Datei hochladen
+    uploaded_file = st.file_uploader("Wählen Sie eine TSV-Datei aus", type="tsv")
+    
+    if uploaded_file is not None:
+        # Lade die Daten aus der hochgeladenen Datei
+        data = load_data(uploaded_file)
         show_sentences(data)  # Zeige die Sätze mit der Animation
 
 if __name__ == "__main__":
