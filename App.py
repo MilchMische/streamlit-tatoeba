@@ -1,19 +1,20 @@
 import streamlit as st
 import pandas as pd
+import time
 
 # Funktion zum Laden der hochgeladenen Datei und zur Inspektion des Dateiinhalts
 def load_data(uploaded_file):
     try:
-        # Datei einlesen und einige Zeilen anzeigen, um den Inhalt zu überprüfen
-        data = pd.read_csv(uploaded_file, sep="\t", on_bad_lines="skip", header=None)
+        # Datei einlesen und nur die Spalten mit den relevanten Daten behalten
+        data = pd.read_csv(uploaded_file, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
         
         # Dateiinformationen anzeigen
         st.write("Vorschau der ersten 5 Zeilen der hochgeladenen Datei:")
         st.write(data.head())  # Zeige die ersten 5 Zeilen der Datei
         
-        # Überprüfen, ob mindestens 5 Spalten vorhanden sind
-        if data.shape[1] < 5:
-            st.error(f"Die hochgeladene Datei enthält {data.shape[1]} Spalten. Erwartet werden mindestens 5 Spalten.")
+        # Überprüfen, ob mindestens 2 Spalten vorhanden sind
+        if data.shape[1] < 2:
+            st.error(f"Die hochgeladene Datei enthält {data.shape[1]} Spalten. Erwartet werden mindestens 2 Spalten.")
             return None
         return data
     except pd.errors.ParserError as e:
@@ -48,8 +49,8 @@ if 'data' in st.session_state and st.session_state['data'] is not None:
         for _ in range(10):  # Anzahl der angezeigten Sätze
             # Zufälliges Satzpaar aus den Daten auswählen
             random_row = data.sample(1).iloc[0]
-            italian_sentence = random_row[2]  # 3. Spalte: Italienischer Satz
-            english_translation = random_row[4]  # 5. Spalte: Englische Übersetzung
+            italian_sentence = random_row[1]  # 2. Spalte: Italienischer Satz
+            english_translation = random_row[1]  # 4. Spalte: Englische Übersetzung
 
             # Satzpaare nur anzeigen, wenn beide Werte vorhanden sind
             if pd.isna(italian_sentence) or pd.isna(english_translation):
