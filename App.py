@@ -16,6 +16,19 @@ def load_data(uploaded_file):
         st.error(f"Unexpected error: {e}")
         return None
 
+# Zeigt die ersten paar Zeilen und die Spaltennamen der hochgeladenen TSV-Datei an
+if uploaded_file is not None:
+    # Laden der Datei
+    data = pd.read_csv(uploaded_file, sep="\t", on_bad_lines="skip")
+    
+    # Spaltennamen und erste paar Zeilen anzeigen
+    st.write("Column names in the uploaded file:")
+    st.write(data.columns)  # Zeigt die Spaltennamen an
+    
+    st.write("First few rows of the file:")
+    st.write(data.head())  # Zeigt die ersten Zeilen zur Überprüfung an
+
+
 # Set the title for the Streamlit app
 st.title("✨ Tatoeba Sentence Pair Display ✨")
 
