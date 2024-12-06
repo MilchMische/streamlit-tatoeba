@@ -1,19 +1,19 @@
-import streamlit as st
+import gdown
 import pandas as pd
 import random
 import time
-import gdown
+import streamlit as st
 
 # Funktion zum Laden der Datei automatisch von Google Drive
 def load_data_from_drive():
-    # Google Drive-Link
-    url = "https://drive.google.com/uc?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm"  # Ersetze dies mit dem korrekten ID-Link
+    # Direktlink für Google Drive (richtiger Format)
+    url = "https://drive.google.com/uc?id=1IIQhp6BT9nmWvZYByedjLKV1ifX8PrIm"  # Ersetze dies mit der richtigen ID
     output_path = "/mnt/data/tatoeba_data.tsv"  # Speicherort für die heruntergeladene Datei
 
-    # Datei von Google Drive herunterladen
-    gdown.download(url, output_path, quiet=False)
-
     try:
+        # Datei von Google Drive herunterladen
+        gdown.download(url, output_path, quiet=False)
+
         # TSV-Datei einlesen
         data = pd.read_csv(output_path, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
 
@@ -22,8 +22,11 @@ def load_data_from_drive():
             st.error(f"Die hochgeladene Datei enthält {data.shape[1]} Spalten. Erwartet werden mindestens 2 Spalten.")
             return None
         return data
-    except pd.errors.ParserError as e:
-        st.error(f"Fehler beim Laden der Daten: {e}")
+    except gdown.exceptions.FileURLRetrievalError as e:
+        st.error(f"Fehler beim Abrufen der Datei von Google Drive: {e}")
+        return None
+    except Exception as e:
+        st.error(f"Unbekannter Fehler: {e}")
         return None
 
 # Streamlit app layout
