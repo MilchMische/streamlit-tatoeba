@@ -6,13 +6,22 @@ import time
 # Funktion zum Laden der hochgeladenen Datei und zur Inspektion des Dateiinhalts
 def load_data(uploaded_file):
     try:
-        # Datei einlesen und nur die Spalten mit den relevanten Daten behalten, fehlerhafte Zeilen überspringen
-        data = pd.read_csv(uploaded_file, sep="\t", header=None, usecols=[1, 3], on_bad_lines="skip")
+        # Versuche, die Datei einzulesen und alle Zeilen zu verarbeiten
+        data = pd.read_csv(uploaded_file, sep="\t", header=None, on_bad_lines="skip")
         
-        # Überprüfen, ob mindestens 2 Spalten vorhanden sind
-        if data.shape[1] < 2:
-            st.error(f"Die hochgeladene Datei enthält {data.shape[1]} Spalten. Erwartet werden mindestens 2 Spalten.")
+        # Überprüfen, wie viele Spalten die Datei hat
+        num_columns = data.shape[1]
+        
+        # Falls weniger als 2 Spalten vorhanden sind, eine Fehlermeldung ausgeben
+        if num_columns < 2:
+            st.error(f"Die hochgeladene Datei enthält nur {num_columns} Spalten. Es müssen mindestens 2 Spalten vorhanden sein.")
             return None
+        else:
+            st.write(f"Die Datei hat {num_columns} Spalten.")
+        
+        # Nur die relevanten Spalten (1. und 3. Spalte) behalten
+        data = data.iloc[:, [1, 3]]
+        
         return data
     except pd.errors.ParserError as e:
         st.error(f"Fehler beim Laden der Daten: {e}")
